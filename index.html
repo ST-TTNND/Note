@@ -84,7 +84,8 @@
         #user-id-input { background: #222; border: 1px solid #444; color: #00ff00; padding: 6px; border-radius: 5px; width: 65px; text-align: center; font-size: 12px; }
         #note-input { width: 110px; height: 60px; border-radius: 5px; border: none; padding: 8px; font-size: 14px; }
         .btn { border: none; font-weight: bold; border-radius: 5px; height: 60px; cursor: pointer; }
-        #add-btn { background: #fff; color: #000; padding: 0 15px; }#img-btn { background: #333; color: #fff; padding: 0 10px; font-size: 20px; border: 1px solid #555; }
+        #add-btn { background: #fff; color: #000; padding: 0 15px; }
+        #img-btn { background: #333; color: #fff; padding: 0 10px; font-size: 20px; border: 1px solid #555; }
         #room-btn { background: #222; color: #888; border: 1px solid #444; padding: 10px; border-radius: 8px; cursor: pointer; text-align: center; font-size: 11px; }
 
         #timer-container { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 100px; border-right: 1px solid #333; padding-right: 10px; }
@@ -154,7 +155,8 @@
 
     <div id="guide-box">
         <h3>UPDATE - 59 🛸</h3>
-        <p>developed by <a href="https://www.facebook.com/profile.php?id=61585891402987" target="_blank" class="admin-link">Tung Lam</a></p>
+        <p style="margin: 5px 0 2px 0; color: #ccc;">last update : 16:30 6/4/2026</p>
+        <p style="margin: 0; color: #888; font-size: 11px;">version 122.59.01102612</p>
     </div>
 
     <div id="study-toast"></div>
@@ -179,24 +181,19 @@
     </div>
 
     <script>
-        // HÀM PHÁT ÂM THANH TOÀN CỤC
         function playClickSound() {const sound = document.getElementById('click-sound');
             if (sound) {
                 sound.currentTime = 0;
-                sound.play().catch(() => {}); // Né lỗi trình duyệt chặn autoplay
+                sound.play().catch(() => {});
             }
         }
-
-        // TỰ ĐỘNG GẮN SOUND CHO NÚT (TRỪ FACEBOOK)
         document.addEventListener('click', (e) => {
             const target = e.target.closest('button, .btn, .timer-btn, .switch, #menu-btn, #room-btn, [onclick]');
             if (target) {
-                // Kiểm tra nếu là link FB hoặc nằm trong link FB thì KHÔNG phát sound
                 const isFB = target.closest('a') && target.closest('a').href.includes('facebook.com');
                 if (!isFB) playClickSound();
             }
         });
-
         const canvas = document.getElementById('matrix-canvas');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
@@ -222,7 +219,6 @@
                 setTimeout(() => { loader.style.display = "none"; clearInterval(matrixInterval); }, 800);
             }, 2000);
         });
-
         const firebaseConfig = {
             apiKey: "AIzaSyARz3WftjUZ_fRoHn4EcL6k9BGlLNiyMA",
             authDomain: "note-15380.firebaseapp.com",
@@ -234,18 +230,13 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-
         let currentUserId = localStorage.getItem('note_user_id') || 'user_' + Math.random().toString(36).substr(2, 5);
         document.getElementById('user-id-input').value = currentUserId;
-
         const wall = document.getElementById('wall');
         const viewport = document.getElementById('viewport');let wallLeft = 0, wallTop = 0, scale = 1, isPanning = false, startX, startY;
-
         function updateWallTransform() { wall.style.transform = `translate(${wallLeft}px, ${wallTop}px) scale(${scale})`; }
-
         let initialDistance = null, initialScale = 1;
         const getDistance = (touches) => Math.hypot(touches[0].clientX - touches[1].clientX, touches[0].clientY - touches[1].clientY);
-
         const handleStart = (e) => {
             if(e.touches && e.touches.length === 2) {
                 isPanning = false; initialDistance = getDistance(e.touches); initialScale = scale; return;
@@ -274,19 +265,16 @@
             updateWallTransform();
         };
         const handleEnd = () => { isPanning = false; initialDistance = null; };
-
         viewport.addEventListener('mousedown', handleStart);
         window.addEventListener('mousemove', handleMove);
         window.addEventListener('mouseup', handleEnd);
         viewport.addEventListener('touchstart', handleStart, {passive: false});
         window.addEventListener('touchmove', handleMove, {passive: false});
         window.addEventListener('touchend', handleEnd);
-
         window.addEventListener('wheel', (e) => {
             e.preventDefault(); scale -= e.deltaY * 0.001;
             scale = Math.min(Math.max(0.1, scale), 4); updateWallTransform();
         }, {passive: false});
-
         function toggleMenu() {
             const panel = document.getElementById('menu-panel');
             const overlay = document.getElementById('page-overlay');
@@ -295,7 +283,6 @@
         }
         function closeMenu() { document.getElementById('menu-panel').classList.remove('open'); document.getElementById('page-overlay').style.display = 'none'; toggleAbout(false); }function toggleEyeCare(cb) { document.getElementById('eye-care-overlay').style.display = cb.checked ? 'block' : 'none'; }
         function toggleAbout(show) { document.getElementById('about-popup').classList.toggle('open', show); document.getElementById('page-overlay').style.display = show ? 'block' : 'none'; }
-
         let globalPath = "notes"; 
         function toggleMode() {
             const status = document.getElementById('room-status');
@@ -306,7 +293,6 @@
             timerUI.style.display = isToPrivate ? 'none' : 'flex';
             loadNotes();
         }
-
         function loadNotes() {
             const typedId = document.getElementById('user-id-input').value.trim() || currentUserId;
             localStorage.setItem('note_user_id', typedId);
@@ -318,7 +304,6 @@
                 if(data) Object.keys(data).forEach(id => { if (id !== 'private') renderNote(id, data[id], globalPath); });
             });
         }
-
         function renderNote(id, item, currentPath) {
             const note = document.createElement('div');
             note.className = 'sticky-note'; note.contentEditable = "true";
@@ -334,7 +319,6 @@
             makeDraggable(note, id, currentPath);
             wall.appendChild(note);
         }
-
         function makeDraggable(el, id, path) {
             let oX, oY;
             const start = (e) => {
@@ -357,7 +341,6 @@
             };
             el.addEventListener('mousedown', start); el.addEventListener('touchstart', start);
         }
-
         function uploadImage(input) {
             const file = input.files[0]; if (!file) return;
             const reader = new FileReader();
@@ -377,7 +360,6 @@
             };
             reader.readAsDataURL(file);
         }
-
         function sendToCloud() {
             const input = document.getElementById('note-input');
             if (!input.value.trim()) return;
@@ -387,7 +369,6 @@
                 w: "180px", h: "auto", color: document.getElementById('color-picker').value
             }).then(() => { input.value = ""; });
         }
-
         let timerSeconds = 0, timerInterval = null;
         function updateTimerUI() {
             const h = Math.floor(timerSeconds / 3600).toString().padStart(2, '0');
@@ -407,7 +388,6 @@
             setTimeout(() => { toast.style.display = 'none'; }, 3000);
         }
         function resetTimer() { stopTimer(); timerSeconds = 0; updateTimerUI(); }
-
         loadNotes();
     </script>
 </body>
