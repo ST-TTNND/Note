@@ -48,12 +48,15 @@
             overflow: hidden; resize: both; display: flex; flex-direction: column;
         }
         
-        
+        /* CSS FIX CHO LINK */
         .sticky-note a { 
             color: #0056b3 !important; 
             text-decoration: underline !important; 
             font-weight: bold; 
             word-break: break-all;
+            cursor: pointer !important;
+            position: relative;
+            z-index: 1001; /* Đưa link lên trên cùng để dễ bấm */
         }
 
         .sticky-note img { 
@@ -179,7 +182,7 @@
                 <button class="timer-btn" onclick="resetTimer()">RESET</button>
             </div>
         </div>
-        <div id="room-btn" onclick="toggleMode()">Phòng <br> <span id="room-status" style="color: #00ff00;">CÔNG CỘNG</span></div>
+        <div id="room-btn" onclick="toggleMode()">Phòng <br> <span id="room-status" style="color: #00ff00;">🌐 CÔNG CỘNG</span></div>
         <div class="input-group"><input type="text" id="user-id-input" placeholder="Mã ID"></div>
         <textarea id="note-input" placeholder="Viết..."></textarea>
         <input type="file" id="file-input" accept="image/*" style="display: none;" onchange="uploadImage(this)">
@@ -295,8 +298,8 @@
         function toggleMode() {
             const status = document.getElementById('room-status');
             const timerUI = document.getElementById('timer-container'); 
-            const isToPrivate = (status.innerText === 'CÔNG CỘNG');
-            status.innerText = isToPrivate ? 'CÁ NHÂN' : 'CÔNG CỘNG';
+            const isToPrivate = (status.innerText.includes('CÔNG CỘNG'));
+            status.innerText = isToPrivate ? '🔐 CÁ NHÂN' : '🌐 CÔNG CỘNG';
             status.style.color = isToPrivate ? '#ff00ff' : '#00ff00';
             timerUI.style.display = isToPrivate ? 'none' : 'flex';
             loadNotes();
@@ -305,7 +308,7 @@
             const typedId = document.getElementById('user-id-input').value.trim() || currentUserId;
             localStorage.setItem('note_user_id', typedId);
             if (globalPath) db.ref(globalPath).off();
-            globalPath = (document.getElementById('room-status').innerText === 'CÁ NHÂN') ? `notes/private/${typedId}` : 'notes';
+            globalPath = (document.getElementById('room-status').innerText.includes('CÁ NHÂN')) ? `notes/private/${typedId}` : 'notes';
             db.ref(globalPath).on('value', (snapshot) => {
                 wall.innerHTML = "";
                 const data = snapshot.val();
@@ -355,7 +358,9 @@
         function makeDraggable(el, id, path) {
             let oX, oY;
             const start = (e) => {
+                // SỬA LỖI BẤM LINK: Nếu click trúng thẻ <a> thì thoát hàm kéo để trình duyệt mở link
                 if(e.target.tagName === 'A') return; 
+
                 if(e.offsetX > el.offsetWidth - 20 && e.offsetY > el.offsetHeight - 20) return;
                 if(document.activeElement === el) return;
                 const cX = e.touches ? e.touches[0].clientX : e.clientX;
