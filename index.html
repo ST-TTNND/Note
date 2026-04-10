@@ -48,6 +48,9 @@
             overflow: hidden; resize: both; display: flex; flex-direction: column;
         }
         
+        /* CSS cho Link trong Note */
+        .sticky-note a { color: #0056b3; text-decoration: underline; font-weight: bold; }
+
         .sticky-note img { 
             width: 100%; height: auto; flex-shrink: 1; object-fit: contain;border-radius: 5px; margin-top: 8px; pointer-events: none; 
         }
@@ -304,24 +307,51 @@
                 if(data) Object.keys(data).forEach(id => { if (id !== 'private') renderNote(id, data[id], globalPath); });
             });
         }
+
+        // HÀM MỚI: Tự động phát hiện và chuyển văn bản link thành thẻ <a>
+        function linkify(text) {
+            const urlPattern = /(\b(https?):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+            return text.replace(urlPattern, function(url) {
+                return '<a href="' + url + '" target="_blank">' + url + '</a>';
+            });
+        }
+
         function renderNote(id, item, currentPath) {
             const note = document.createElement('div');
             note.className = 'sticky-note'; note.contentEditable = "true";
             note.style.left = item.x || "100px"; note.style.top = item.y || "100px";
             note.style.width = item.w || "180px"; note.style.height = item.h || "auto";
-            note.style.backgroundColor = item.color || '#fff'; note.innerText = item.text || "";
+            note.style.backgroundColor = item.color || '#fff'; 
+            
+            // SỬA ĐỔI: Sử dụng linkify để hiển thị nội dung
+            note.innerHTML = linkify(item.text || ""); 
+
             if (item.image) {
                 const img = document.createElement('img'); img.src = item.image; note.appendChild(img);
             }
             let isDeleting = false;
             note.ondblclick = () => { if(confirm("xác nhận xoá ?")) { isDeleting = true; db.ref(`${currentPath}/${id}`).remove().then(() => note.remove()); } };
-            note.onblur = () => { if(!isDeleting) db.ref(`${currentPath}/${id}`).update({ text: note.innerText, w: note.style.width, h: note.style.height }); };
+            
+            // SỬA ĐỔI: Khi lưu, lấy innerText (văn bản thô) để không lưu cả thẻ HTML vào DB
+            note.onblur = () => { 
+                if(!isDeleting) {
+                    const cleanText = note.innerText;
+                    db.ref(`${currentPath}/${id}`).update({ text: cleanText, w: note.style.width, h: note.style.height });
+                    // Cập nhật lại giao diện để hiện link (nếu có) sau khi sửa
+                    note.innerHTML = linkify(cleanText);
+                    if (item.image) { const img = document.createElement('img'); img.src = item.image; note.appendChild(img); }
+                }
+            };
+
             makeDraggable(note, id, currentPath);
             wall.appendChild(note);
         }
+
         function makeDraggable(el, id, path) {
             let oX, oY;
             const start = (e) => {
+                // SỬA ĐỔI: Cho phép bấm link bên trong note mà không bị kéo note đi
+                if(e.target.tagName === 'A') return; 
                 if(e.offsetX > el.offsetWidth - 20 && e.offsetY > el.offsetHeight - 20) return;
                 if(document.activeElement === el) return;
                 const cX = e.touches ? e.touches[0].clientX : e.clientX;
