@@ -45,10 +45,10 @@
             width: 180px; min-height: 80px; padding: 10px; position: absolute; 
             color: #000; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); 
             font-size: 14px; outline: none; word-wrap: break-word; z-index: 100; 
-            overflow: hidden; resize: both; display: flex; flex-direction: column;
+            overflow: hidden; display: flex; flex-direction: column;
+            user-select: none; /* Tránh việc bôi đen chữ khi đang kéo */
         }
         
-        /* CSS FIX CHO LINK */
         .sticky-note a { 
             color: #0056b3 !important; 
             text-decoration: underline !important; 
@@ -56,13 +56,14 @@
             word-break: break-all;
             cursor: pointer !important;
             position: relative;
-            z-index: 1001; /* Đưa link lên trên cùng để dễ bấm */
+            z-index: 1001;
         }
 
         .sticky-note img { 
-            width: 100%; height: auto; flex-shrink: 1; object-fit: contain;border-radius: 5px; margin-top: 8px; pointer-events: none; 
+            width: 100%; height: auto; flex-shrink: 1; object-fit: contain; border-radius: 5px; margin-top: 8px; pointer-events: none; 
         }
 
+        /* Các Style Menu và Dock giữ nguyên như cũ */
         #menu-btn { position: fixed; top: 20px; right: 20px; cursor: pointer; background: rgba(30, 30, 30, 0.9); border: 1px solid #444; border-radius: 10px; padding: 10px; z-index: 9000; }
         #menu-panel { 
             position: fixed; top: 0; right: -300px; width: 260px; height: 100vh; 
@@ -70,27 +71,18 @@
             z-index: 8000; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding: 80px 20px 20px; 
         }
         #menu-panel.open { right: 0 !important; }
-
         .menu-section { border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 15px; }
         .menu-section h4 { margin: 0 0 5px; color: #00ff00; font-size: 14px; }
-
-        #about-popup { 
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.8); 
-            width: 340px; max-height: 80vh; overflow-y: auto;
-            background: #1e1e1e; border: 2px solid #00ff00; border-radius: 15px; padding: 25px; 
-            z-index: 10000; opacity: 0; visibility: hidden; transition: 0.3s; 
-        }
+        #about-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.8); width: 340px; max-height: 80vh; overflow-y: auto; background: #1e1e1e; border: 2px solid #00ff00; border-radius: 15px; padding: 25px; z-index: 10000; opacity: 0; visibility: hidden; transition: 0.3s; }
         #about-popup.open { opacity: 1; visibility: visible; transform: translate(-50%, -50%) scale(1); }
         #page-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 7500; display: none; }
         #eye-care-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(255, 150, 0, 0.15); z-index: 9999; pointer-events: none; display: none; mix-blend-mode: multiply; }
-
         .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #555; transition: .4s; border-radius: 20px; }
         .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: #00ff00; }
         input:checked + .slider:before { transform: translateX(20px); }
-
         #dock { position: fixed; bottom: 0; width: 100%; height: 110px; background: rgba(15, 15, 15, 0.95); border-top: 1px solid #333; display: flex; justify-content: center; align-items: center; gap: 8px; z-index: 1000; }
         #user-id-input { background: #222; border: 1px solid #444; color: #00ff00; padding: 6px; border-radius: 5px; width: 65px; text-align: center; font-size: 12px; }
         #note-input { width: 110px; height: 60px; border-radius: 5px; border: none; padding: 8px; font-size: 14px; }
@@ -98,18 +90,11 @@
         #add-btn { background: #fff; color: #000; padding: 0 15px; }
         #img-btn { background: #333; color: #fff; padding: 0 10px; font-size: 20px; border: 1px solid #555; }
         #room-btn { background: #222; color: #888; border: 1px solid #444; padding: 10px; border-radius: 8px; cursor: pointer; text-align: center; font-size: 11px; }
-
         #timer-container { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 100px; border-right: 1px solid #333; padding-right: 10px; }
         #timer-display { font-family: monospace; font-size: 18px; color: #00ff00; font-weight: bold; }
         .timer-controls { display: flex; gap: 4px; }
         .timer-btn { background: #222; border: 1px solid #555; color: white; font-size: 10px; padding: 3px 6px; border-radius: 4px; cursor: pointer; }
-        
-        #study-toast {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: rgba(0, 255, 0, 0.9); color: black; padding: 20px 30px;
-            border-radius: 15px; font-weight: bold; font-size: 18px; z-index: 3000;
-            display: none; text-align: center; box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
-        }
+        #study-toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 255, 0, 0.9); color: black; padding: 20px 30px; border-radius: 15px; font-weight: bold; font-size: 18px; z-index: 3000; display: none; text-align: center; box-shadow: 0 0 20px rgba(0, 255, 0, 0.5); }
         .about-link { color: #00d4ff; text-decoration: none; }
     </style>
 </head>
@@ -146,28 +131,15 @@
     <div id="about-popup">
         <span onclick="toggleAbout(false)" style="position: absolute; top: 10px; right: 15px; cursor: pointer; color: #00ff00; font-weight: bold;">✕</span>
         <h3 style="color: #00ff00; margin-top: 0; text-align: center;">Về chúng tôi</h3>
-        <p style="font-size: 13px; line-height: 1.5; color: white; text-align: justify; margin-bottom: 15px;">Xin chào! Free Note là một sản phẩm được chúng mình lấy ý tưởng và phát triển từ các trang, các diễn đàn chia sẻ kiến thức, bài tập, hay kinh nghiệm học tập... Hy vọng web của bọn mình có thể hỗ trợ các bạn!
-        </p>
+        <p style="font-size: 13px; line-height: 1.5; color: white; text-align: justify; margin-bottom: 15px;">Xin chào! Free Note là một sản phẩm được chúng mình lấy ý tưởng và phát triển từ các trang chia sẻ kiến thức. Hy vọng hỗ trợ được các bạn!</p>
         <div style="font-size: 13px; line-height: 1.6;">
-            <p><strong>Nhà phát triển chính 🛠️:</strong><br>
-                <a href="https://www.facebook.com/profile.php?id=61585891402987" target="_blank" class="admin-link" style="font-size: 14px;">Lê Hoàng Tùng Lâm</a>
-            </p>
-            <p><strong>Các nhà tài trợ 💲:</strong><br>
-                • <a href="https://www.facebook.com/profile.php?id=100090648150836" target="_blank" class="about-link">Lương Việt Tiến</a><br>
-                • <a href="https://www.facebook.com/nguyen.le.minh.942067" target="_blank" class="about-link">Nguyễn Lê Minh</a>
-            </p>
-            <p><strong>Và một số thành viên khác 🕸️:</strong><br>
-                • <a href="https://www.facebook.com/thfenthaoo" target="_blank" class="about-link">Phạm Lê Thiên Thảo</a><br>
-                • <a href="https://www.facebook.com/nguyen.huu.loc.61406" target="_blank" class="about-link">Nguyễn Hữu Lộc</a><br>
-                • <a href="https://www.facebook.com/profile.php?id=61580451671854" target="_blank" class="about-link">Nguyễn Anh Huy</a>
-            </p>
+            <p><strong>Nhà phát triển 🛠️:</strong> <a href="https://www.facebook.com/profile.php?id=61585891402987" target="_blank" class="admin-link">Lê Hoàng Tùng Lâm</a></p>
         </div>
     </div>
 
     <div id="guide-box">
         <h3>UPDATE - 60 🌐</h3>
         <p style="margin: 5px 0 2px 0; color: #ccc;">last update : 16:30 6/4/2026</p>
-        <p style="margin: 0; color: #888; font-size: 11px;">version 122.59.01102612</p>
     </div>
 
     <div id="study-toast"></div>
@@ -183,7 +155,7 @@
             </div>
         </div>
         <div id="room-btn" onclick="toggleMode()">Phòng <br> <span id="room-status" style="color: #00ff00;">🌐 CÔNG CỘNG</span></div>
-        <div class="input-group"><input type="text" id="user-id-input" placeholder="Mã ID"></div>
+        <input type="text" id="user-id-input" placeholder="Mã ID">
         <textarea id="note-input" placeholder="Viết..."></textarea>
         <input type="file" id="file-input" accept="image/*" style="display: none;" onchange="uploadImage(this)">
         <button id="img-btn" class="btn" onclick="document.getElementById('file-input').click()">🖼️</button>
@@ -192,19 +164,10 @@
     </div>
 
     <script>
-        function playClickSound() {const sound = document.getElementById('click-sound');
-            if (sound) {
-                sound.currentTime = 0;
-                sound.play().catch(() => {});
-            }
-        }
-        document.addEventListener('click', (e) => {
-            const target = e.target.closest('button, .btn, .timer-btn, .switch, #menu-btn, #room-btn, [onclick]');
-            if (target) {
-                const isFB = target.closest('a') && target.closest('a').href.includes('facebook.com');
-                if (!isFB) playClickSound();
-            }
-        });
+        // --- CÁC HÀM CƠ BẢN (KHÔNG ĐỔI) ---
+        function playClickSound() {const sound = document.getElementById('click-sound'); if (sound) { sound.currentTime = 0; sound.play().catch(() => {}); } }
+        document.addEventListener('click', (e) => { const target = e.target.closest('button, .btn, .timer-btn, .switch, #menu-btn, #room-btn, [onclick]'); if (target) { if (!(target.closest('a') && target.closest('a').href.includes('facebook.com'))) playClickSound(); } });
+        
         const canvas = document.getElementById('matrix-canvas');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
@@ -212,24 +175,10 @@
         const fontSize = 16;
         const columns = canvas.width / fontSize;
         const drops = Array(Math.floor(columns)).fill(1);
-        function drawMatrix() {
-            ctx.fillStyle = "rgba(0, 0, 0, 0.05)"; ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = "#0F0"; ctx.font = fontSize + "px monospace";
-            for (let i = 0; i < drops.length; i++) {
-                const text = letters.charAt(Math.floor(Math.random() * letters.length));
-                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
-                drops[i]++;
-            }
-        }
+        function drawMatrix() { ctx.fillStyle = "rgba(0, 0, 0, 0.05)"; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.fillStyle = "#0F0"; ctx.font = fontSize + "px monospace"; for (let i = 0; i < drops.length; i++) { const text = letters.charAt(Math.floor(Math.random() * letters.length)); ctx.fillText(text, i * fontSize, drops[i] * fontSize); if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0; drops[i]++; } }
         let matrixInterval = setInterval(drawMatrix, 35);
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                const loader = document.getElementById('loader-wrapper');
-                loader.style.opacity = "0";
-                setTimeout(() => { loader.style.display = "none"; clearInterval(matrixInterval); }, 800);
-            }, 2000);
-        });
+        window.addEventListener('load', () => { setTimeout(() => { const loader = document.getElementById('loader-wrapper'); loader.style.opacity = "0"; setTimeout(() => { loader.style.display = "none"; clearInterval(matrixInterval); }, 800); }, 2000); });
+
         const firebaseConfig = {
             apiKey: "AIzaSyARz3WftjUZ_fRoHn4EcL6k9BGlLNiyMA",
             authDomain: "note-15380.firebaseapp.com",
@@ -244,14 +193,14 @@
         let currentUserId = localStorage.getItem('note_user_id') || 'user_' + Math.random().toString(36).substr(2, 5);
         document.getElementById('user-id-input').value = currentUserId;
         const wall = document.getElementById('wall');
-        const viewport = document.getElementById('viewport');let wallLeft = 0, wallTop = 0, scale = 1, isPanning = false, startX, startY;
+        const viewport = document.getElementById('viewport');
+        let wallLeft = 0, wallTop = 0, scale = 1, isPanning = false, startX, startY;
         function updateWallTransform() { wall.style.transform = `translate(${wallLeft}px, ${wallTop}px) scale(${scale})`; }
-        let initialDistance = null, initialScale = 1;
+        
+        // --- PAN & ZOOM ---
         const getDistance = (touches) => Math.hypot(touches[0].clientX - touches[1].clientX, touches[0].clientY - touches[1].clientY);
         const handleStart = (e) => {
-            if(e.touches && e.touches.length === 2) {
-                isPanning = false; initialDistance = getDistance(e.touches); initialScale = scale; return;
-            }
+            if(e.touches && e.touches.length === 2) { isPanning = false; initialDistance = getDistance(e.touches); initialScale = scale; return; }
             if(e.target !== viewport && e.target !== wall) return;
             isPanning = true;
             const cX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -262,11 +211,7 @@
             if (e.touches && e.touches.length === 2) {
                 e.preventDefault();
                 const currentDistance = getDistance(e.touches);
-                if (initialDistance) {
-                    const delta = currentDistance / initialDistance;
-                    scale = Math.min(Math.max(0.1, initialScale * delta), 4);
-                    updateWallTransform();
-                }
+                if (typeof initialDistance !== 'undefined') { scale = Math.min(Math.max(0.1, initialScale * (currentDistance / initialDistance)), 4); updateWallTransform(); }
                 return;
             }
             if (!isPanning) return;
@@ -275,25 +220,19 @@
             wallLeft = cX - startX; wallTop = cY - startY;
             updateWallTransform();
         };
-        const handleEnd = () => { isPanning = false; initialDistance = null; };
         viewport.addEventListener('mousedown', handleStart);
         window.addEventListener('mousemove', handleMove);
-        window.addEventListener('mouseup', handleEnd);
+        window.addEventListener('mouseup', () => isPanning = false);
         viewport.addEventListener('touchstart', handleStart, {passive: false});
         window.addEventListener('touchmove', handleMove, {passive: false});
-        window.addEventListener('touchend', handleEnd);
-        window.addEventListener('wheel', (e) => {
-            e.preventDefault(); scale -= e.deltaY * 0.001;
-            scale = Math.min(Math.max(0.1, scale), 4); updateWallTransform();
-        }, {passive: false});
-        function toggleMenu() {
-            const panel = document.getElementById('menu-panel');
-            const overlay = document.getElementById('page-overlay');
-            if (!panel.classList.contains('open')) { panel.classList.add('open'); overlay.style.display = 'block'; }
-            else { panel.classList.remove('open'); overlay.style.display = 'none'; }
-        }
-        function closeMenu() { document.getElementById('menu-panel').classList.remove('open'); document.getElementById('page-overlay').style.display = 'none'; toggleAbout(false); }function toggleEyeCare(cb) { document.getElementById('eye-care-overlay').style.display = cb.checked ? 'block' : 'none'; }
+        window.addEventListener('touchend', () => isPanning = false);
+        window.addEventListener('wheel', (e) => { e.preventDefault(); scale = Math.min(Math.max(0.1, scale - e.deltaY * 0.001), 4); updateWallTransform(); }, {passive: false});
+
+        function toggleMenu() { const panel = document.getElementById('menu-panel'); const overlay = document.getElementById('page-overlay'); if (!panel.classList.contains('open')) { panel.classList.add('open'); overlay.style.display = 'block'; } else { panel.classList.remove('open'); overlay.style.display = 'none'; } }
+        function closeMenu() { document.getElementById('menu-panel').classList.remove('open'); document.getElementById('page-overlay').style.display = 'none'; toggleAbout(false); }
+        function toggleEyeCare(cb) { document.getElementById('eye-care-overlay').style.display = cb.checked ? 'block' : 'none'; }
         function toggleAbout(show) { document.getElementById('about-popup').classList.toggle('open', show); document.getElementById('page-overlay').style.display = show ? 'block' : 'none'; }
+        
         let globalPath = "notes"; 
         function toggleMode() {
             const status = document.getElementById('room-status');
@@ -304,6 +243,7 @@
             timerUI.style.display = isToPrivate ? 'none' : 'flex';
             loadNotes();
         }
+
         function loadNotes() {
             const typedId = document.getElementById('user-id-input').value.trim() || currentUserId;
             localStorage.setItem('note_user_id', typedId);
@@ -316,37 +256,49 @@
             });
         }
 
-        
         function linkify(text) {
             const urlPattern = /(\b(https?):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
-            return text.replace(urlPattern, function(url) {
-                return '<a href="' + url + '" target="_blank" rel="noopener noreferrer">' + url + '</a>';
-            });
+            return text.replace(urlPattern, (url) => `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`);
         }
 
+        // --- ĐOẠN PHẪU THUẬT RENDER NOTE MỚI ---
         function renderNote(id, item, currentPath) {
             const note = document.createElement('div');
-            note.className = 'sticky-note'; note.contentEditable = "true";
+            note.className = 'sticky-note'; 
+            note.contentEditable = "false"; // Tắt để link nhạy
             note.style.left = item.x || "100px"; note.style.top = item.y || "100px";
             note.style.width = item.w || "180px"; note.style.height = item.h || "auto";
             note.style.backgroundColor = item.color || '#fff'; 
-            
             
             note.innerHTML = linkify(item.text || ""); 
 
             if (item.image) {
                 const img = document.createElement('img'); img.src = item.image; note.appendChild(img);
             }
-            let isDeleting = false;
-            note.ondblclick = () => { if(confirm("xác nhận xoá ?")) { isDeleting = true; db.ref(`${currentPath}/${id}`).remove().then(() => note.remove()); } };
-            
-            
-            note.onblur = () => { 
-                if(!isDeleting) {
-                    const cleanText = note.innerText;
-                    db.ref(`${currentPath}/${id}`).update({ text: cleanText, w: note.style.width, h: note.style.height });
-                    
-                    note.innerHTML = linkify(cleanText);
+
+            // Click 1 lần: Mở link
+            note.onclick = (e) => {
+                if (e.target.tagName === 'A') {
+                    e.preventDefault();
+                    window.open(e.target.href, '_blank');
+                }
+            };
+
+            // Double Click: Bảng sửa/xóa 2-trong-1
+            note.ondblclick = (e) => {
+                e.stopPropagation();
+                const oldText = note.innerText.replace("Hình ảnh", "").trim();
+                const newText = prompt("📝 SỬA NỘI DUNG:\n(Xóa sạch chữ rồi OK để XOÁ note)", oldText);
+
+                if (newText === null) return; 
+
+                if (newText.trim() === "") {
+                    if(confirm("Dọn dẹp note này luôn chứ?")) {
+                        db.ref(`${currentPath}/${id}`).remove().then(() => note.remove());
+                    }
+                } else {
+                    db.ref(`${currentPath}/${id}`).update({ text: newText });
+                    note.innerHTML = linkify(newText);
                     if (item.image) { const img = document.createElement('img'); img.src = item.image; note.appendChild(img); }
                 }
             };
@@ -358,13 +310,11 @@
         function makeDraggable(el, id, path) {
             let oX, oY;
             const start = (e) => {
-                // SỬA LỖI BẤM LINK: Nếu click trúng thẻ <a> thì thoát hàm kéo để trình duyệt mở link
                 if(e.target.tagName === 'A') return; 
-
                 if(e.offsetX > el.offsetWidth - 20 && e.offsetY > el.offsetHeight - 20) return;
-                if(document.activeElement === el) return;
                 const cX = e.touches ? e.touches[0].clientX : e.clientX;
-                const cY = e.touches ? e.touches[0].clientY : e.clientY;oX = cX - el.offsetLeft; oY = cY - el.offsetTop;
+                const cY = e.touches ? e.touches[0].clientY : e.clientY;
+                oX = cX - el.offsetLeft; oY = cY - el.offsetTop;
                 const move = (ev) => {
                     const mX = ev.touches ? ev.touches[0].clientX : ev.clientX;
                     const mY = ev.touches ? ev.touches[0].clientY : ev.clientY;
@@ -380,6 +330,7 @@
             };
             el.addEventListener('mousedown', start); el.addEventListener('touchstart', start);
         }
+
         function uploadImage(input) {
             const file = input.files[0]; if (!file) return;
             const reader = new FileReader();
@@ -399,6 +350,7 @@
             };
             reader.readAsDataURL(file);
         }
+
         function sendToCloud() {
             const input = document.getElementById('note-input');
             if (!input.value.trim()) return;
@@ -408,25 +360,26 @@
                 w: "180px", h: "auto", color: document.getElementById('color-picker').value
             }).then(() => { input.value = ""; });
         }
+
         let timerSeconds = 0, timerInterval = null;
         function updateTimerUI() {
             const h = Math.floor(timerSeconds / 3600).toString().padStart(2, '0');
             const m = Math.floor((timerSeconds % 3600) / 60).toString().padStart(2, '0');
             const s = (timerSeconds % 60).toString().padStart(2, '0');
-            document.getElementById('timer-display').innerText = h + ":" + m + ":" + s;
-        }function startTimer() { if (timerInterval) return; timerInterval = setInterval(() => { timerSeconds++; updateTimerUI(); }, 1000); }
+            document.getElementById('timer-display').innerText = `${h}:${m}:${s}`;
+        }
+        function startTimer() { if (timerInterval) return; timerInterval = setInterval(() => { timerSeconds++; updateTimerUI(); }, 1000); }
         function stopTimer() {
             if (!timerInterval) return; clearInterval(timerInterval); timerInterval = null;
-            const hours = Math.floor(timerSeconds / 3600);
-            const minutes = Math.floor((timerSeconds % 3600) / 60);
-            const seconds = timerSeconds % 60;
+            const h = Math.floor(timerSeconds/3600), m = Math.floor((timerSeconds%3600)/60), s = timerSeconds%60;
             const toast = document.getElementById('study-toast');
-            toast.innerText = "Chúc mừng! Bạn đã học được " + hours + "h " + minutes + "m " + seconds + "s 🎉";
+            toast.innerText = `Chúc mừng! Bạn đã học được ${h}h ${m}m ${s}s 🎉`;
             toast.style.display = 'block'; 
-            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#00ff00', '#00d4ff', '#ffffff', '#ff00ff'] });
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
             setTimeout(() => { toast.style.display = 'none'; }, 3000);
         }
         function resetTimer() { stopTimer(); timerSeconds = 0; updateTimerUI(); }
+        
         loadNotes();
     </script>
 </body>
