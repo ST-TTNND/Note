@@ -24,7 +24,12 @@
             letter-spacing: 2px;
         }
 
-        #guide-box { position: fixed; top: 20px; left: 20px; width: fit-content; background: rgba(30, 30, 30, 0.9); border: 1px solid #444; border-radius: 10px; padding: 12px 18px; z-index: 2000; font-size: 13px; }
+        /* GUIDE BOX CHỨA VERSION QUAN TRỌNG */
+        #guide-box { 
+            position: fixed; top: 20px; left: 20px; width: fit-content; 
+            background: rgba(30, 30, 30, 0.9); border: 1px solid #444; 
+            border-radius: 10px; padding: 12px 18px; z-index: 2000; font-size: 13px; 
+        }
         #guide-box h3 { margin: 0 0 5px 0; color: #00ff00; font-size: 16px; }
         
         .admin-link { 
@@ -55,7 +60,6 @@
         #menu-panel { position: fixed; top: 0; right: -300px; width: 260px; height: 100vh; background: rgba(15, 15, 15, 0.98); border-left: 1px solid #333; z-index: 8000; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding: 80px 20px 20px; }
         #menu-panel.open { right: 0 !important; }
 
-        /* PHẦN CHỈ DẪN MỚI */
         #menu-hint {
             position: fixed; top: 70px; right: 25px;
             background: #00ff00; color: #000; padding: 8px 12px;
@@ -125,9 +129,6 @@
     </div>
 
     <div id="menu-panel">
-        <div class="menu-section">
-            <h4 style="cursor: pointer; color: #00ff00; margin: 0;" onclick="toggleHowTo(true)">Hướng dẫn sử dụng 📖</h4>
-        </div>
         <div class="menu-section" style="display: flex; justify-content: space-between; align-items: center;">
             <h4>Bảo vệ mắt 👀</h4>
             <label class="switch">
@@ -135,6 +136,11 @@
                 <span class="slider"></span>
             </label>
         </div>
+        
+        <div class="menu-section">
+            <h4 style="cursor: pointer; color: #00ff00; margin: 0;" onclick="toggleHowTo(true)">Hướng dẫn sử dụng 📖</h4>
+        </div>
+
         <div class="menu-section">
             <h4 style="cursor: pointer; text-decoration: underline; color: #00ff00; margin: 0;" onclick="toggleAbout(true)">Về chúng tôi</h4>
         </div>
@@ -161,6 +167,7 @@
     <div id="guide-box">
         <h3>UPDATE - 60 🌐</h3>
         <p style="margin: 5px 0 2px 0; color: #ccc;">last update : 16:30 6/4/2026</p>
+        <p style="margin: 0; color: #888; font-size: 11px;">version 122.59.01102612</p>
     </div>
 
     <div id="study-toast"></div>
@@ -205,13 +212,11 @@
                 setTimeout(() => { 
                     loader.style.display = "none"; 
                     clearInterval(matrixInterval); 
-                    // SAU KHI LOAD XONG THÌ HIỆN MŨI TÊN CHỈ DẪN
                     document.getElementById('menu-hint').style.display = 'block';
                 }, 800);
             }, 2000);
         });
 
-        // Hàm ẩn gợi ý và mở menu
         function hideHintAndOpenMenu() {
             document.getElementById('menu-hint').style.display = 'none';
             toggleMenu();
@@ -245,7 +250,7 @@
             const panel = document.getElementById('menu-panel');
             const overlay = document.getElementById('page-overlay');
             const hint = document.getElementById('menu-hint');
-            if (hint) hint.style.display = 'none'; // Bấm vào menu thì ẩn luôn gợi ý
+            if (hint) hint.style.display = 'none';
             if (!panel.classList.contains('open')) { panel.classList.add('open'); overlay.style.display = 'block'; }
             else { panel.classList.remove('open'); overlay.style.display = 'none'; }
         }
