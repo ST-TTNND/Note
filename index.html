@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Free Note - made by bad guy</title>
+    <title>Creative Note</title>
     <link rel="icon" href="unnamed-1.jpg">
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
@@ -48,6 +48,8 @@
             overflow: hidden; resize: both; display: flex; flex-direction: column;
         }
         
+        /* Cập nhật hiển thị Link từ đoạn 2 */
+        .sticky-note a { color: #0056b3 !important; text-decoration: underline !important; font-weight: bold; word-break: break-all; cursor: pointer !important; position: relative; z-index: 101; }
         .sticky-note img { 
             width: 100%; height: auto; flex-shrink: 1; object-fit: contain;border-radius: 5px; margin-top: 8px; pointer-events: none; 
         }
@@ -63,7 +65,6 @@
         .menu-section { border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 15px; }
         .menu-section h4 { margin: 0 0 5px; color: #00ff00; font-size: 14px; }
 
-        /* CSS CHO POPUP HƯỚNG DẪN */
         #about-popup, #how-to-popup { 
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.8); 
             width: 340px; max-height: 80vh; overflow-y: auto;
@@ -200,24 +201,24 @@
     </div>
 
     <script>
-        // HÀM PHÁT ÂM THANH TOÀN CỤC
-        function playClickSound() {const sound = document.getElementById('click-sound');
+        // LOGIC ÂM THANH
+        function playClickSound() {
+            const sound = document.getElementById('click-sound');
             if (sound) {
                 sound.currentTime = 0;
-                sound.play().catch(() => {}); // Né lỗi trình duyệt chặn autoplay
+                sound.play().catch(() => {});
             }
         }
 
-        // TỰ ĐỘNG GẮN SOUND CHO NÚT (TRỪ FACEBOOK)
         document.addEventListener('click', (e) => {
             const target = e.target.closest('button, .btn, .timer-btn, .switch, #menu-btn, #room-btn, [onclick]');
             if (target) {
-                // Kiểm tra nếu là link FB hoặc nằm trong link FB thì KHÔNG phát sound
                 const isFB = target.closest('a') && target.closest('a').href.includes('facebook.com');
                 if (!isFB) playClickSound();
             }
         });
 
+        // HIỆU ỨNG MATRIX
         const canvas = document.getElementById('matrix-canvas');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
@@ -244,6 +245,7 @@
             }, 2000);
         });
 
+        // FIREBASE CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyARz3WftjUZ_fRoHn4EcL6k9BGlLNiyMA",
             authDomain: "note-15380.firebaseapp.com",
@@ -259,8 +261,10 @@
         let currentUserId = localStorage.getItem('note_user_id') || 'user_' + Math.random().toString(36).substr(2, 5);
         document.getElementById('user-id-input').value = currentUserId;
 
+        // DI CHUYỂN & ZOOM
         const wall = document.getElementById('wall');
-        const viewport = document.getElementById('viewport');let wallLeft = 0, wallTop = 0, scale = 1, isPanning = false, startX, startY;
+        const viewport = document.getElementById('viewport');
+        let wallLeft = 0, wallTop = 0, scale = 1, isPanning = false, startX, startY;
 
         function updateWallTransform() { wall.style.transform = `translate(${wallLeft}px, ${wallTop}px) scale(${scale})`; }
 
@@ -308,6 +312,7 @@
             scale = Math.min(Math.max(0.1, scale), 4); updateWallTransform();
         }, {passive: false});
 
+        // MENU & POPUP
         function toggleMenu() {
             const panel = document.getElementById('menu-panel');
             const overlay = document.getElementById('page-overlay');
@@ -317,10 +322,9 @@
         function closeMenu() { document.getElementById('menu-panel').classList.remove('open'); document.getElementById('page-overlay').style.display = 'none'; toggleAbout(false); toggleHowTo(false); }
         function toggleEyeCare(cb) { document.getElementById('eye-care-overlay').style.display = cb.checked ? 'block' : 'none'; }
         function toggleAbout(show) { document.getElementById('about-popup').classList.toggle('open', show); document.getElementById('page-overlay').style.display = show ? 'block' : 'none'; }
-        
-        // HÀM ĐÓNG MỞ HƯỚNG DẪN
         function toggleHowTo(show) { document.getElementById('how-to-popup').classList.toggle('open', show); document.getElementById('page-overlay').style.display = show ? 'block' : 'none'; }
 
+        // CHẾ ĐỘ PHÒNG
         let globalPath = "notes"; 
         function toggleMode() {
             const status = document.getElementById('room-status');
@@ -344,18 +348,27 @@
             });
         }
 
+        // RENDER NOTE & LINK RECOGNITION (TỪ BẢN 2)
         function renderNote(id, item, currentPath) {
             const note = document.createElement('div');
             note.className = 'sticky-note'; note.contentEditable = "true";
             note.style.left = item.x || "100px"; note.style.top = item.y || "100px";
             note.style.width = item.w || "180px"; note.style.height = item.h || "auto";
-            note.style.backgroundColor = item.color || '#fff'; note.innerText = item.text || "";
+            note.style.backgroundColor = item.color || '#fff';
+            
+            // Xử lý nội dung (bao gồm link)
+            const rawText = item.text || "";
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            note.innerHTML = rawText.replace(urlRegex, (url) => `<a href="${url}" target="_blank" contenteditable="false">${url}</a>`);
+
             if (item.image) {
                 const img = document.createElement('img'); img.src = item.image; note.appendChild(img);
             }
+            
             let isDeleting = false;
             note.ondblclick = () => { if(confirm("xác nhận xoá ?")) { isDeleting = true; db.ref(`${currentPath}/${id}`).remove().then(() => note.remove()); } };
             note.onblur = () => { if(!isDeleting) db.ref(`${currentPath}/${id}`).update({ text: note.innerText, w: note.style.width, h: note.style.height }); };
+            
             makeDraggable(note, id, currentPath);
             wall.appendChild(note);
         }
@@ -363,10 +376,12 @@
         function makeDraggable(el, id, path) {
             let oX, oY;
             const start = (e) => {
+                if(e.target.tagName === 'A') return; // Không drag khi nhấn vào link
                 if(e.offsetX > el.offsetWidth - 20 && e.offsetY > el.offsetHeight - 20) return;
                 if(document.activeElement === el) return;
                 const cX = e.touches ? e.touches[0].clientX : e.clientX;
-                const cY = e.touches ? e.touches[0].clientY : e.clientY;oX = cX - el.offsetLeft; oY = cY - el.offsetTop;
+                const cY = e.touches ? e.touches[0].clientY : e.clientY;
+                oX = cX - el.offsetLeft; oY = cY - el.offsetTop;
                 const move = (ev) => {
                     const mX = ev.touches ? ev.touches[0].clientX : ev.clientX;
                     const mY = ev.touches ? ev.touches[0].clientY : ev.clientY;
@@ -413,13 +428,15 @@
             }).then(() => { input.value = ""; });
         }
 
+        // TIMER LOGIC
         let timerSeconds = 0, timerInterval = null;
         function updateTimerUI() {
             const h = Math.floor(timerSeconds / 3600).toString().padStart(2, '0');
             const m = Math.floor((timerSeconds % 3600) / 60).toString().padStart(2, '0');
             const s = (timerSeconds % 60).toString().padStart(2, '0');
             document.getElementById('timer-display').innerText = h + ":" + m + ":" + s;
-        }function startTimer() { if (timerInterval) return; timerInterval = setInterval(() => { timerSeconds++; updateTimerUI(); }, 1000); }
+        }
+        function startTimer() { if (timerInterval) return; timerInterval = setInterval(() => { timerSeconds++; updateTimerUI(); }, 1000); }
         function stopTimer() {
             if (!timerInterval) return; clearInterval(timerInterval); timerInterval = null;
             const hours = Math.floor(timerSeconds / 3600);
