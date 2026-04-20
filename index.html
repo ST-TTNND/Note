@@ -200,7 +200,24 @@
     </div>
 
     <script>
-        // LOGIC ÂM THANH
+        // Thông báo "HDSD"
+        function toggleMenu() {
+            const panel = document.getElementById('menu-panel');
+            const overlay = document.getElementById('page-overlay');
+            const hint = document.getElementById('menu-hint');
+
+            if (hint) hint.style.display = 'none';
+
+            if (!panel.classList.contains('open')) { 
+                panel.classList.add('open'); 
+                overlay.style.display = 'block'; 
+            }
+            else { 
+                panel.classList.remove('open'); 
+                overlay.style.display = 'none'; 
+            }
+        }
+        // Âm Thanh
         function playClickSound() {
             const sound = document.getElementById('click-sound');
             if (sound) {
@@ -260,7 +277,7 @@
         let currentUserId = localStorage.getItem('note_user_id') || 'user_' + Math.random().toString(36).substr(2, 5);
         document.getElementById('user-id-input').value = currentUserId;
 
-        // DI CHUYỂN & ZOOM
+        // Di Chuyển
         const wall = document.getElementById('wall');
         const viewport = document.getElementById('viewport');
         let wallLeft = 0, wallTop = 0, scale = 1, isPanning = false, startX, startY;
@@ -311,7 +328,7 @@
             scale = Math.min(Math.max(0.1, scale), 4); updateWallTransform();
         }, {passive: false});
 
-        // MENU & POPUP
+        // Menu & Popup
         function toggleMenu() {
             const panel = document.getElementById('menu-panel');
             const overlay = document.getElementById('page-overlay');
@@ -323,7 +340,7 @@
         function toggleAbout(show) { document.getElementById('about-popup').classList.toggle('open', show); document.getElementById('page-overlay').style.display = show ? 'block' : 'none'; }
         function toggleHowTo(show) { document.getElementById('how-to-popup').classList.toggle('open', show); document.getElementById('page-overlay').style.display = show ? 'block' : 'none'; }
 
-        // CHẾ ĐỘ PHÒNG
+        // Phòng
         let globalPath = "notes"; 
         function toggleMode() {
             const status = document.getElementById('room-status');
