@@ -26,6 +26,25 @@
 
         #guide-box { position: fixed; top: 20px; left: 20px; width: fit-content; background: rgba(30, 30, 30, 0.9); border: 1px solid #444; border-radius: 10px; padding: 12px 18px; z-index: 2000; font-size: 13px; }
         #guide-box h3 { margin: 0 0 5px 0; color: #00ff00; font-size: 16px; }
+
+        /* THÔNG BÁO HƯỚNG DẪN */
+        #menu-hint {
+            position: fixed; top: 25px; right: 75px; 
+            background: #00ff00; color: #000; padding: 6px 12px; 
+            border-radius: 8px; font-size: 12px; font-weight: bold;
+            z-index: 8500; animation: bounceHint 2s infinite;
+            pointer-events: none; display: none;
+        }
+        #menu-hint::after {
+            content: ''; position: absolute; right: -8px; top: 50%;
+            transform: translateY(-50%);
+            border-top: 6px solid transparent; border-bottom: 6px solid transparent;
+            border-left: 8px solid #00ff00;
+        }
+        @keyframes bounceHint {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(-8px); }
+        }
         
         .admin-link { 
             background: linear-gradient(90deg, #00ff00, #00d4ff, #00ffbc, #00ff00);
@@ -115,6 +134,8 @@
     <div id="eye-care-overlay"></div>
     <div id="page-overlay" onclick="closeMenu()"></div>
 
+    <div id="menu-hint">Bấm vào để xem hướng dẫn sử dụng</div>
+
     <div id="menu-btn" onclick="toggleMenu()">
         <div style="width: 20px; height: 2px; background: #eee; margin: 4px 0;"></div>
         <div style="width: 20px; height: 2px; background: #eee; margin: 4px 0;"></div>
@@ -198,7 +219,6 @@
     </div>
 
     <script>
-        // Thông báo "HDSD"
         function toggleMenu() {
             const panel = document.getElementById('menu-panel');
             const overlay = document.getElementById('page-overlay');
@@ -215,7 +235,7 @@
                 overlay.style.display = 'none'; 
             }
         }
-        // Âm Thanh
+
         function playClickSound() {
             const sound = document.getElementById('click-sound');
             if (sound) {
@@ -232,7 +252,6 @@
             }
         });
 
-        // MATRIX EFFECT
         const canvas = document.getElementById('matrix-canvas');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
@@ -251,15 +270,29 @@
             }
         }
         let matrixInterval = setInterval(drawMatrix, 35);
+        
         window.addEventListener('load', () => {
             setTimeout(() => {
                 const loader = document.getElementById('loader-wrapper');
                 loader.style.opacity = "0";
-                setTimeout(() => { loader.style.display = "none"; clearInterval(matrixInterval); }, 800);
+                setTimeout(() => { 
+                    loader.style.display = "none"; 
+                    clearInterval(matrixInterval); 
+                    
+                    // Thông báo tự ẩn sau 4 giây
+                    const hint = document.getElementById('menu-hint');
+                    if (hint) {
+                        hint.style.display = 'block';
+                        setTimeout(() => {
+                            hint.style.transition = "opacity 0.8s ease";
+                            hint.style.opacity = "0";
+                            setTimeout(() => { hint.style.display = 'none'; }, 800);
+                        }, 4000);
+                    }
+                }, 800);
             }, 2000);
         });
 
-        // FIREBASE CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyARz3WftjUZ_fRoHn4EcL6k9BGlLNiyMA",
             authDomain: "note-15380.firebaseapp.com",
@@ -275,7 +308,6 @@
         let currentUserId = localStorage.getItem('note_user_id') || 'user_' + Math.random().toString(36).substr(2, 5);
         document.getElementById('user-id-input').value = currentUserId;
 
-        // DI CHUYỂN BASE
         const wall = document.getElementById('wall');
         const viewport = document.getElementById('viewport');
         let wallLeft = 0, wallTop = 0, scale = 1, isPanning = false, startX, startY;
@@ -326,19 +358,11 @@
             scale = Math.min(Math.max(0.1, scale), 4); updateWallTransform();
         }, {passive: false});
 
-        // MENU & POPPUP
-        function toggleMenu() {
-            const panel = document.getElementById('menu-panel');
-            const overlay = document.getElementById('page-overlay');
-            if (!panel.classList.contains('open')) { panel.classList.add('open'); overlay.style.display = 'block'; }
-            else { panel.classList.remove('open'); overlay.style.display = 'none'; }
-        }
         function closeMenu() { document.getElementById('menu-panel').classList.remove('open'); document.getElementById('page-overlay').style.display = 'none'; toggleAbout(false); toggleHowTo(false); }
         function toggleEyeCare(cb) { document.getElementById('eye-care-overlay').style.display = cb.checked ? 'block' : 'none'; }
         function toggleAbout(show) { document.getElementById('about-popup').classList.toggle('open', show); document.getElementById('page-overlay').style.display = show ? 'block' : 'none'; }
         function toggleHowTo(show) { document.getElementById('how-to-popup').classList.toggle('open', show); document.getElementById('page-overlay').style.display = show ? 'block' : 'none'; }
 
-        // ROOM
         let globalPath = "notes"; 
         function toggleMode() {
             const status = document.getElementById('room-status');
@@ -448,18 +472,29 @@
             document.getElementById('timer-display').innerText = h + ":" + m + ":" + s;
         }
         function startTimer() { if (timerInterval) return; timerInterval = setInterval(() => { timerSeconds++; updateTimerUI(); }, 1000); }
+        
         function stopTimer() {
-            if (!timerInterval) return; clearInterval(timerInterval); timerInterval = null;
-            const hours = Math.floor(timerSeconds / 3600);
-            const minutes = Math.floor((timerSeconds % 3600) / 60);
-            const seconds = timerSeconds % 60;
-            const toast = document.getElementById('study-toast');
-            toast.innerText = "Chúc mừng! Bạn đã học được " + hours + "h " + minutes + "m " + seconds + "s 🎉";
-            toast.style.display = 'block'; 
-            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#00ff00', '#00d4ff', '#ffffff', '#ff00ff'] });
-            setTimeout(() => { toast.style.display = 'none'; }, 3000);
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
         }
-        function resetTimer() { stopTimer(); timerSeconds = 0; updateTimerUI(); }
+        
+        function resetTimer() {
+            stopTimer();
+            if (timerSeconds > 0) {
+                const hours = Math.floor(timerSeconds / 3600);
+                const minutes = Math.floor((timerSeconds % 3600) / 60);
+                const seconds = timerSeconds % 60;
+                const toast = document.getElementById('study-toast');
+                toast.innerText = "Tổng thời gian học: " + hours + "h " + minutes + "m " + seconds + "s 🎉";
+                toast.style.display = 'block'; 
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#00ff00', '#00d4ff', '#ffffff', '#ff00ff'] });
+                setTimeout(() => { toast.style.display = 'none'; }, 3000);
+            }
+            timerSeconds = 0;
+            updateTimerUI();
+        }
 
         loadNotes();
     </script>
